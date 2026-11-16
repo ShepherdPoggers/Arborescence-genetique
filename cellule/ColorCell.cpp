@@ -1,41 +1,34 @@
 #include "ColorCell.h"
+
+#include <iostream>
 #include <stdexcept>
+#include <utility>
 
-using namespace std;
-
-ColorCell::ColorCell(string unNom, int unRouge,
-                     int unVert, int unBleu) : Cell(unNom),
-                                               rouge(unRouge), vert(unVert), bleu(unBleu)
+ColorCell::ColorCell(std::string unNom, int unRouge, int unVert, int unBleu)
+    : nom(std::move(unNom)), rouge(unRouge), vert(unVert), bleu(unBleu)
 {
+    if (rouge < 0 || rouge > 255 || vert < 0 || vert > 255 || bleu < 0 || bleu > 255)
+        throw std::invalid_argument("Les composantes RGB doivent etre entre 0 et 255.");
 }
 
-ColorCell *ColorCell::operator+(const Cell &autre)
+ColorCell* ColorCell::operator+(const ColorCell& autre) const
 {
-    const ColorCell *color = dynamic_cast<const ColorCell *>(&autre);
-    if (color == nullptr)
-        throw invalid_argument("Une ColorCell doit être additionner à une ColorCell.");
-
-    int nouveauRouge;
-    int nouveauVert;
-    int nouveauBleu;
-    ColorCell *c3 = nullptr;
-
-    nouveauRouge = (rouge + color->rouge) / 2;
-    nouveauVert = (vert + color->vert) / 2;
-    nouveauBleu = (bleu + color->bleu) / 2;
-
-    c3 = new ColorCell("NouvColorCell", nouveauRouge,
-                       nouveauVert, nouveauBleu);
-    return c3;
+    return new ColorCell("NouvColorCell", (rouge + autre.rouge) / 2,
+                         (vert + autre.vert) / 2, (bleu + autre.bleu) / 2);
 }
 
-void ColorCell::afficher()
+void ColorCell::afficher() const
 {
-    cout << this->rouge << " " << this->vert << " " << this->bleu << endl;
+    std::cout << rouge << ' ' << vert << ' ' << bleu << '\n';
 }
 
 void ColorCell::afficher(std::ostream& os) const
 {
-    Cell::afficher(os);
-    os << " : " << rouge << " " << vert << " " << bleu;
+    os << nom << " : " << rouge << ' ' << vert << ' ' << bleu;
+}
+
+std::ostream& operator<<(std::ostream& os, const ColorCell& cellule)
+{
+    cellule.afficher(os);
+    return os;
 }

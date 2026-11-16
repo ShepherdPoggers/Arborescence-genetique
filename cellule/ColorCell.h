@@ -1,22 +1,26 @@
-#pragma once
-#include <iostream>
-#include "cell.h"
-#include <string>
 #ifndef ARBORESCENCE_GENETIQUE_COLORCELL_H
 #define ARBORESCENCE_GENETIQUE_COLORCELL_H
 
-class ColorCell : public Cell{
+#include <ostream>
+#include <string>
+
+class ColorCell
+{
 private:
+    std::string nom;
     int rouge;
     int vert;
     int bleu;
 
 public:
     ColorCell(std::string unNom, int rouge, int vert, int bleu);
-    ColorCell* operator+(const Cell& autre) override;
-    void afficher();
-    void afficher(std::ostream& os) const override;
+    int getRouge() const { return rouge; }
+    int getVert() const { return vert; }
+    int getBleu() const { return bleu; }
+    ColorCell* operator+(const ColorCell& autre) const;
+    void afficher() const;
+    void afficher(std::ostream& os) const;
+    friend std::ostream& operator<<(std::ostream& os, const ColorCell& cellule);
 };
-
 
 #endif

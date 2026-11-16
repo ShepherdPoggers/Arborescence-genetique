@@ -6,9 +6,14 @@ template <class T>
 class Arbre;
 
 template <class T>
+class Population;
+
+template <class T>
 class Feuille
 {
     friend class Arbre<T>;
+    template <class U>
+    friend class Population;
 
 private:
     T valeur;
@@ -23,11 +28,8 @@ public:
     {
     }
 
-    Feuille<T>* operator+(Feuille<T>& autre)
-    {
-        T temp = *valeur + *autre.valeur;
-        return new Feuille<T>(temp, this, &autre);
-    }
+    const Feuille<T>* getParent1() const { return parent1; }
+    const Feuille<T>* getParent2() const { return parent2; }
 
     friend std::ostream& operator<<(std::ostream& os, const Feuille& feuille)
     {
