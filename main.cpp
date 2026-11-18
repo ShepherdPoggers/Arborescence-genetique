@@ -1,15 +1,26 @@
+#include "execution.h"
+
+#include <cstdlib>
+#include <exception>
 #include <iostream>
-#include "ColorCell.h"
-#include "ChromoCell.h"
-using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
-    //TEST
-    ChromoCell c1("IJ", "KL", "AC", "BD");
-    ChromoCell c2("AB", "CD", "EF", "GH");
-    ChromoCell c3 = ChromoCell::additionCellule(c1, c2);
-    c3.afficher();
+    if (argc != 2)
+    {
+        std::cerr << "Utilisation : " << argv[0] << " TRANSACTIONS.txt\n";
+        return EXIT_FAILURE;
+    }
 
-    return 0;
+    try
+    {
+        executerTransactions(argv[1], std::cout);
+    }
+    catch (const std::exception& erreur)
+    {
+        std::cerr << "Erreur : " << erreur.what() << '\n';
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
