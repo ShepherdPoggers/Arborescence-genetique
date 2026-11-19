@@ -4,6 +4,7 @@
 #include "population/population.h"
 #include "cellule/ColorCell.h"
 #include "cellule/ChromoCell.h"
+#include "cellule/HorlogeCell.h"
 
 #include <ostream>
 #include <string>
@@ -19,7 +20,7 @@ struct Transaction
 
 // Contient la population courante. monostate indique qu'aucune population n'a été créée ou chargée.
 using PopulationCourante = std::variant<std::monostate,
-                                       Population<ColorCell>, Population<ChromoCell>>;
+                                       Population<ColorCell>, Population<ChromoCell>, Population<HorlogeCell>>;
 
 std::vector<Transaction> chargerTransaction(
     const std::string& fichierTransaction);

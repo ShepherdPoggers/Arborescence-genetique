@@ -22,7 +22,7 @@ namespace
 
     void verifierType(const std::string& type)
     {
-        if (type != "COLORCELL" && type != "CHROMOCELL")
+        if (type != "COLORCELL" && type != "CHROMOCELL" && type != "HORLOGECELL")
             throw std::invalid_argument("Type de population inconnu : " + type);
     }
 
@@ -83,6 +83,9 @@ namespace
     template<>
     const char* nomType<ChromoCell>() { return "CHROMOCELL"; }
 
+    template<>
+    const char* nomType<HorlogeCell>() { return "HORLOGECELL"; }
+
     template<class T>
     std::unique_ptr<T> lireCellule(std::istream& flux, const std::string& nom);
 
@@ -110,6 +113,12 @@ namespace
         return std::make_unique<ChromoCell>(nom, paire1, paire2, paire3, paire4);
     }
 
+    template<>
+    std::unique_ptr<HorlogeCell> lireCellule<HorlogeCell>(std::istream& flux, const std::string& nom)
+    {
+
+    }
+
     void ecrireCellule(std::ostream& flux, const ColorCell& cellule)
     {
         verifierCouleur(cellule.getRouge(), cellule.getVert(), cellule.getBleu());
@@ -120,6 +129,11 @@ namespace
     {
         flux << cellule.getPaire1() << ' ' << cellule.getPaire2()
              << ' ' << cellule.getPaire3() << ' ' << cellule.getPaire4();
+    }
+
+    void ecrireCellule(std::ostream& flux, const HorlogeCell& cellule)
+    {
+
     }
 
     template<class T>
@@ -346,7 +360,9 @@ PopulationCourante chargerPopulation(const std::string& fichierPopulation)
 
         if (type == "COLORCELL")
             return lirePopulation<ColorCell>(fichier, nombreIndividus, numeroLigne);
-        return lirePopulation<ChromoCell>(fichier, nombreIndividus, numeroLigne);
+        else if (type == "CHROMOCELL")
+            return lirePopulation<ChromoCell>(fichier, nombreIndividus, numeroLigne);
+        return lirePopulation<HorlogeCell>(fichier, nombreIndividus, numeroLigne);
     }
     catch (const std::exception& erreur)
     {
@@ -365,12 +381,19 @@ void sauvegarderPopulation(const std::string& fichierPopulation, const Populatio
     sauvegarderPopulationTypee(fichierPopulation, population);
 }
 
+void sauvegarderPopulation(const std::string& fichierPopulation, const Population<HorlogeCell>& population)
+{
+    sauvegarderPopulationTypee(fichierPopulation, population);
+}
+
 void sauvegarderPopulation(const std::string& fichierPopulation, const PopulationCourante& population)
 {
     if (const Population<ColorCell>* couleurs = std::get_if<Population<ColorCell>>(&population))
         sauvegarderPopulationTypee(fichierPopulation, *couleurs);
     else if (const Population<ChromoCell>* chromosomes = std::get_if<Population<ChromoCell>>(&population))
         sauvegarderPopulationTypee(fichierPopulation, *chromosomes);
+    else if (const Population<HorlogeCell>* temps = std::get_if<Population<HorlogeCell>>(&population))
+        sauvegarderPopulationTypee(fichierPopulation, *temps);
     else
         throw std::invalid_argument("Aucune population courante. Utiliser C ou O d'abord.");
 }
@@ -438,8 +461,10 @@ void executerTransactions(const std::string& fichierTransaction, std::ostream& s
                 verifierType(transaction.parametres[0]);
                 if (transaction.parametres[0] == "COLORCELL")
                     courante = Population<ColorCell>();
-                else
+                else if (transaction.parametres[0] == "CHROMOCELL")
                     courante = Population<ChromoCell>();
+                else
+                    courante = Population<HorlogeCell>();
                 sortie << "Population " << transaction.parametres[0] << " creee.\n";
             }
             else if (transaction.operation == 'O')
@@ -454,6 +479,8 @@ void executerTransactions(const std::string& fichierTransaction, std::ostream& s
                 executerSurPopulation(transaction, *couleurs, dossier, sortie);
             else if (Population<ChromoCell>* chromosomes = std::get_if<Population<ChromoCell>>(&courante))
                 executerSurPopulation(transaction, *chromosomes, dossier, sortie);
+            else if (Population<HorlogeCell>* temps = std::get_if<Population<HorlogeCell>>(&courante))
+                executerSurPopulation(transaction, *temps, dossier, sortie);
             else
                 throw std::invalid_argument("Aucune population courante. Utiliser C ou O d'abord.");
         }
